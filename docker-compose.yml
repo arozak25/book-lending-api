@@ -1,0 +1,44 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: book-lending-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-book_lending}
+      MYSQL_USER: ${DB_USERNAME:-book_lending}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-book_lending}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  api:
+    image: maven:3.9.9-eclipse-temurin-17
+    container_name: book-lending-api
+    working_dir: /workspace
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql:3306
+      DB_NAME: ${DB_NAME:-book_lending}
+      DB_USERNAME: ${DB_USERNAME:-book_lending}
+      DB_PASSWORD: ${DB_PASSWORD:-book_lending}
+    command: ./mvnw spring-boot:run
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    volumes:
+      - ./:/workspace
+      - maven_cache:/root/.m2
+
+volumes:
+  mysql_data:
+  maven_cache:
