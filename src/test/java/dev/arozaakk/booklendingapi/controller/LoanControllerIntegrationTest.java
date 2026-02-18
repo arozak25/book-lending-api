@@ -3,10 +3,12 @@ package dev.arozaakk.booklendingapi.controller;
 import static dev.arozaakk.booklendingapi.factory.BookFactory.createBookCreate;
 import static dev.arozaakk.booklendingapi.factory.LoanFactory.createLoanCreate;
 import static dev.arozaakk.booklendingapi.factory.MemberFactory.createMemberCreate;
-import static dev.arozaakk.booklendingapi.testsupport.SqlScriptPaths.CLEANUP_SQL;
+import static dev.arozaakk.booklendingapi.common.RestDocs.prettyDocument;
+import static dev.arozaakk.booklendingapi.common.SqlScriptPaths.CLEANUP_SQL;
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -25,27 +27,42 @@ import dev.arozaakk.booklendingapi.service.LoanService;
 import dev.arozaakk.booklendingapi.service.MemberService;
 import jakarta.inject.Inject;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest
 @ActiveProfiles("integration-test")
-@AutoConfigureMockMvc
+@ExtendWith(RestDocumentationExtension.class)
 @SqlGroup({@Sql(scripts = CLEANUP_SQL, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)})
 public class LoanControllerIntegrationTest {
-  @Inject private MockMvc mockMvc;
+  @Inject private WebApplicationContext context;
   @Inject private LoanService loanService;
   @Inject private BookService bookService;
   @Inject private MemberService memberService;
   @Inject private ObjectMapper objectMapper;
+  private MockMvc mockMvc;
+
+  @BeforeEach
+  void setUp(RestDocumentationContextProvider restDocumentation) {
+    this.mockMvc =
+        MockMvcBuilders.webAppContextSetup(context)
+            .apply(springSecurity())
+            .apply(documentationConfiguration(restDocumentation))
+            .build();
+  }
 
   @Test
   void createLoan_withoutUser_shouldReturnUnauthorized() throws Exception {
@@ -54,7 +71,6 @@ public class LoanControllerIntegrationTest {
     mockMvc
         .perform(
             post(LoanResource.PATH)
-                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loanCreate)))
         .andExpect(status().isUnauthorized());
@@ -67,7 +83,6 @@ public class LoanControllerIntegrationTest {
     mockMvc
         .perform(
             patch(LoanResource.PATH + "/{id}", UUID.randomUUID())
-                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loanComplete)))
         .andExpect(status().isUnauthorized());
@@ -100,7 +115,6 @@ public class LoanControllerIntegrationTest {
     mockMvc
         .perform(
             post(LoanResource.PATH)
-                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loanCreate)))
         .andExpect(status().isCreated())
@@ -109,7 +123,8 @@ public class LoanControllerIntegrationTest {
         .andExpect(jsonPath("$.book.id").value(book.id().toString()))
         .andExpect(jsonPath("$.member.id").value(member.id().toString()))
         .andExpect(jsonPath("$.borrowedAt").isString())
-        .andExpect(jsonPath("$.dueDate").isString());
+        .andExpect(jsonPath("$.dueDate").isString())
+        .andDo(prettyDocument("loans-create"));
 
     Book updatedBook = bookService.getBookById(book.id());
     assertEquals(availableBeforeCreateLoan - 1, updatedBook.availableCopies());
@@ -127,7 +142,6 @@ public class LoanControllerIntegrationTest {
     mockMvc
         .perform(
             patch(LoanResource.PATH + "/{id}", loan.id())
-                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loanComplete)))
         .andExpect(status().isOk())
@@ -135,7 +149,8 @@ public class LoanControllerIntegrationTest {
         .andExpect(jsonPath("$.status").value(LoanStatus.COMPLETED.name()))
         .andExpect(jsonPath("$.book.id").value(book.id().toString()))
         .andExpect(jsonPath("$.member.id").value(member.id().toString()))
-        .andExpect(jsonPath("$.completedAt").isString());
+        .andExpect(jsonPath("$.completedAt").isString())
+        .andDo(prettyDocument("loans-complete"));
 
     Book updatedBook = bookService.getBookById(book.id());
     assertEquals(availableBeforeCompleteLoan + 1, updatedBook.availableCopies());
@@ -161,7 +176,8 @@ public class LoanControllerIntegrationTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.length()").value(2))
         .andExpect(
-            jsonPath("$[*].id", hasItems(firstLoan.id().toString(), secondLoan.id().toString())));
+            jsonPath("$[*].id", hasItems(firstLoan.id().toString(), secondLoan.id().toString())))
+        .andDo(prettyDocument("loans-list"));
   }
 
   @Test
@@ -180,6 +196,7 @@ public class LoanControllerIntegrationTest {
         .andExpect(jsonPath("$.book.id").value(book.id().toString()))
         .andExpect(jsonPath("$.member.id").value(member.id().toString()))
         .andExpect(jsonPath("$.borrowedAt").isString())
-        .andExpect(jsonPath("$.dueDate").isString());
+        .andExpect(jsonPath("$.dueDate").isString())
+        .andDo(prettyDocument("loans-get-by-id"));
   }
 }

@@ -1,0 +1,313 @@
+= Book Lending API Reference
+:toc: left
+:toclevels: 3
+:sectanchors:
+:snippets: {snippets}
+
+This reference is generated from MockMvc integration tests via Spring REST Docs.
+
+== Overview
+
+- Base URL: `http://localhost:8080`
+- Authentication: HTTP Basic (`ADMIN` role required)
+- Content type: `application/json`
+- CSRF protection: disabled
+
+== Endpoint Map
+
+[cols="1,1,2,1",options="header"]
+|===
+|Domain |Method |Path |Success Status
+
+|Books |`POST` |`/books` |`201 Created`
+|Books |`GET` |`/books/{id}` |`200 OK`
+|Books |`GET` |`/books` |`200 OK`
+|Books |`PUT` |`/books/{id}` |`200 OK`
+|Books |`DELETE` |`/books/{id}` |`204 No Content`
+
+|Members |`POST` |`/members` |`201 Created`
+|Members |`GET` |`/members/{id}` |`200 OK`
+|Members |`GET` |`/members` |`200 OK`
+|Members |`PUT` |`/members/{id}` |`200 OK`
+
+|Loans |`POST` |`/loans` |`201 Created`
+|Loans |`PATCH` |`/loans/{id}` |`200 OK`
+|Loans |`GET` |`/loans` |`200 OK`
+|Loans |`GET` |`/loans/{id}` |`200 OK`
+|===
+
+== Books
+
+=== Create Book
+
+[cols="1,3",options="header"]
+|===
+|Attribute |Value
+|Method |`POST`
+|Path |`/books`
+|Description |Create a new book entry.
+|===
+
+==== Request
+
+include::{snippets}/books-create/http-request.adoc[]
+
+include::{snippets}/books-create/request-body.adoc[]
+
+==== Response
+
+include::{snippets}/books-create/http-response.adoc[]
+
+include::{snippets}/books-create/response-body.adoc[]
+
+=== Get Book By ID
+
+[cols="1,3",options="header"]
+|===
+|Attribute |Value
+|Method |`GET`
+|Path |`/books/{id}`
+|Description |Retrieve one book by UUID.
+|===
+
+==== Request
+
+include::{snippets}/books-get-by-id/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/books-get-by-id/http-response.adoc[]
+
+include::{snippets}/books-get-by-id/response-body.adoc[]
+
+=== List Books
+
+[cols="1,3",options="header"]
+|===
+|Attribute |Value
+|Method |`GET`
+|Path |`/books`
+|Description |List all books.
+|===
+
+==== Request
+
+include::{snippets}/books-list/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/books-list/http-response.adoc[]
+
+include::{snippets}/books-list/response-body.adoc[]
+
+=== Update Book
+
+[cols="1,3",options="header"]
+|===
+|Attribute |Value
+|Method |`PUT`
+|Path |`/books/{id}`
+|Description |Update book metadata and add copies.
+|===
+
+==== Request
+
+include::{snippets}/books-update/http-request.adoc[]
+
+include::{snippets}/books-update/request-body.adoc[]
+
+==== Response
+
+include::{snippets}/books-update/http-response.adoc[]
+
+include::{snippets}/books-update/response-body.adoc[]
+
+=== Delete Book
+
+[cols="1,3",options="header"]
+|===
+|Attribute |Value
+|Method |`DELETE`
+|Path |`/books/{id}`
+|Description |Delete a book by UUID.
+|===
+
+==== Request
+
+include::{snippets}/books-delete/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/books-delete/http-response.adoc[]
+
+== Members
+
+=== Create Member
+
+[cols="1,3",options="header"]
+|===
+|Attribute |Value
+|Method |`POST`
+|Path |`/members`
+|Description |Create a new member.
+|===
+
+==== Request
+
+include::{snippets}/members-create/http-request.adoc[]
+
+include::{snippets}/members-create/request-body.adoc[]
+
+==== Response
+
+include::{snippets}/members-create/http-response.adoc[]
+
+include::{snippets}/members-create/response-body.adoc[]
+
+=== Get Member By ID
+
+[cols="1,3",options="header"]
+|===
+|Attribute |Value
+|Method |`GET`
+|Path |`/members/{id}`
+|Description |Retrieve one member by UUID.
+|===
+
+==== Request
+
+include::{snippets}/members-get-by-id/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/members-get-by-id/http-response.adoc[]
+
+include::{snippets}/members-get-by-id/response-body.adoc[]
+
+=== List Members
+
+[cols="1,3",options="header"]
+|===
+|Attribute |Value
+|Method |`GET`
+|Path |`/members`
+|Description |List all members.
+|===
+
+==== Request
+
+include::{snippets}/members-list/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/members-list/http-response.adoc[]
+
+include::{snippets}/members-list/response-body.adoc[]
+
+=== Update Member
+
+[cols="1,3",options="header"]
+|===
+|Attribute |Value
+|Method |`PUT`
+|Path |`/members/{id}`
+|Description |Update member profile and status.
+|===
+
+==== Request
+
+include::{snippets}/members-update/http-request.adoc[]
+
+include::{snippets}/members-update/request-body.adoc[]
+
+==== Response
+
+include::{snippets}/members-update/http-response.adoc[]
+
+include::{snippets}/members-update/response-body.adoc[]
+
+== Loans
+
+=== Create Loan
+
+[cols="1,3",options="header"]
+|===
+|Attribute |Value
+|Method |`POST`
+|Path |`/loans`
+|Description |Create a new active loan.
+|===
+
+==== Request
+
+include::{snippets}/loans-create/http-request.adoc[]
+
+include::{snippets}/loans-create/request-body.adoc[]
+
+==== Response
+
+include::{snippets}/loans-create/http-response.adoc[]
+
+include::{snippets}/loans-create/response-body.adoc[]
+
+=== Complete Loan
+
+[cols="1,3",options="header"]
+|===
+|Attribute |Value
+|Method |`PATCH`
+|Path |`/loans/{id}`
+|Description |Complete an active loan with final status.
+|===
+
+==== Request
+
+include::{snippets}/loans-complete/http-request.adoc[]
+
+include::{snippets}/loans-complete/request-body.adoc[]
+
+==== Response
+
+include::{snippets}/loans-complete/http-response.adoc[]
+
+include::{snippets}/loans-complete/response-body.adoc[]
+
+=== List Loans
+
+[cols="1,3",options="header"]
+|===
+|Attribute |Value
+|Method |`GET`
+|Path |`/loans`
+|Description |List all loans.
+|===
+
+==== Request
+
+include::{snippets}/loans-list/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/loans-list/http-response.adoc[]
+
+include::{snippets}/loans-list/response-body.adoc[]
+
+=== Get Loan By ID
+
+[cols="1,3",options="header"]
+|===
+|Attribute |Value
+|Method |`GET`
+|Path |`/loans/{id}`
+|Description |Retrieve one loan by UUID.
+|===
+
+==== Request
+
+include::{snippets}/loans-get-by-id/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/loans-get-by-id/http-response.adoc[]
+
+include::{snippets}/loans-get-by-id/response-body.adoc[]
