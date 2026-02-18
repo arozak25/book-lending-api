@@ -26,17 +26,17 @@ public class LoanEntity {
   private LoanStatus status;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "book_id")
+  @JoinColumn(name = "book_id", nullable = false)
   private BookEntity bookEntity;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "member_id")
+  @JoinColumn(name = "member_id", nullable = false)
   private MemberEntity memberEntity;
 
-  @Column(name = "borrowed_utc", updatable = false)
+  @Column(name = "borrowed_utc", updatable = false, nullable = false)
   private LocalDateTime borrowedDateTime;
 
-  @Column(name = "due_utc", updatable = false)
+  @Column(name = "due_utc", updatable = false, nullable = false)
   private LocalDateTime dueDateTime;
 
   @Column(name = "completed_utc", updatable = false)

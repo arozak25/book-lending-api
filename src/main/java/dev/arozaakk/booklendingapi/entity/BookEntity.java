@@ -17,22 +17,22 @@ public class BookEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long _id;
 
-  @Column(name = "book_uuid")
+  @Column(name = "book_uuid", nullable = false)
   private UUID bookUuid;
 
-  @Column(name = "title")
+  @Column(name = "title", nullable = false)
   private String title;
 
-  @Column(name = "author")
+  @Column(name = "author", nullable = false)
   private String author;
 
-  @Column(name = "isbn")
+  @Column(name = "isbn", nullable = false)
   private String isbn;
 
-  @Column(name = "total_copies")
+  @Column(name = "total_copies", nullable = false)
   private Long totalCopies;
 
-  @Column(name = "available_copies")
+  @Column(name = "available_copies", nullable = false)
   private Long availableCopies;
 
   @Column(name = "created_utc", nullable = false, insertable = false, updatable = false)

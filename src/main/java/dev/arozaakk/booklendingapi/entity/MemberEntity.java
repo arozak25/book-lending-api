@@ -18,16 +18,16 @@ public class MemberEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long _id;
 
-  @Column(name = "member_uuid")
+  @Column(name = "member_uuid", nullable = false)
   private UUID memberUuid;
 
-  @Column(name = "name")
+  @Column(name = "name", nullable = false)
   private String name;
 
-  @Column(name = "email")
+  @Column(name = "email", nullable = false)
   private String email;
 
-  @Column(name = "status")
+  @Column(name = "status", nullable = false)
   @Enumerated(EnumType.STRING)
   private MemberStatus status;
 
