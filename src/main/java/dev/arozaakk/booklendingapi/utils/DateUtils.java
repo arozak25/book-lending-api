@@ -1,12 +1,16 @@
 package dev.arozaakk.booklendingapi.utils;
 
-import static java.time.ZoneOffset.UTC;
-
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
-public class DateUtils {
+public final class DateUtils {
+  public static final ZoneId UTC_ZONE = ZoneOffset.UTC;
+
+  private DateUtils() {}
+
   public static ZonedDateTime toUtcZonedDateTime(LocalDateTime value) {
-    return value == null ? null : value.atZone(UTC);
+    return value == null ? null : value.atZone(UTC_ZONE);
   }
 }

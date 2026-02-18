@@ -2,6 +2,7 @@ package dev.arozaakk.booklendingapi.factory;
 
 import static dev.arozaakk.booklendingapi.utils.DateUtils.toUtcZonedDateTime;
 
+import dev.arozaakk.booklendingapi.entity.BookEntity;
 import dev.arozaakk.booklendingapi.model.Book;
 import dev.arozaakk.booklendingapi.model.BookCreate;
 import dev.arozaakk.booklendingapi.model.BookUpdate;
@@ -55,5 +56,22 @@ public final class BookFactory {
       ZonedDateTime updatedDateTime) {
     return new Book(
         id, title, author, isbn, totalCopies, availableCopies, createdDateTime, updatedDateTime);
+  }
+
+  public static BookEntity createBookEntity() {
+    return createBookEntity(
+        UUID.randomUUID(), "Clean Architecture", "Robert C. Martin", "9780134494166", 5L, 5L);
+  }
+
+  public static BookEntity createBookEntity(
+      UUID id, String title, String author, String isbn, Long totalCopies, Long availableCopies) {
+    BookEntity book = new BookEntity();
+    book.setBookUuid(id);
+    book.setTitle(title);
+    book.setAuthor(author);
+    book.setIsbn(isbn);
+    book.setTotalCopies(totalCopies);
+    book.setAvailableCopies(availableCopies);
+    return book;
   }
 }

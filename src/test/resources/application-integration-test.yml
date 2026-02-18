@@ -12,3 +12,8 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: false
+
+loan:
+  rules:
+    max-active-loans-per-member: ${IT_LOAN_MAX_ACTIVE_PER_MEMBER:3}
+    duration-days: ${IT_LOAN_DURATION_DAYS:14}

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,22 +23,26 @@ public class BookServiceImpl implements BookService {
   private final BookRepository bookRepository;
 
   @Override
+  @Transactional
   public Book createBook(BookCreate bookCreate) {
     BookEntity bookEntity = toBookEntity(bookCreate);
     return toBook(bookRepository.save(bookEntity));
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Book getBookById(UUID id) {
     return toBook(bookRepository.findFirstByBookUuid(id).orElseThrow());
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<Book> findMembers() {
     return bookRepository.findAll().stream().map(BookMapper::toBook).toList();
   }
 
   @Override
+  @Transactional
   public Book updateBook(UUID id, BookUpdate bookUpdate) {
     BookEntity bookEntity = bookRepository.findFirstByBookUuid(id).orElseThrow();
     bookEntity.setTitle(bookUpdate.title());
@@ -50,6 +55,7 @@ public class BookServiceImpl implements BookService {
   }
 
   @Override
+  @Transactional
   public void deleteBook(UUID id) {
     BookEntity bookEntity = bookRepository.findFirstByBookUuid(id).orElseThrow();
     bookRepository.delete(bookEntity);

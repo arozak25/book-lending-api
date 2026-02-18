@@ -14,3 +14,8 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: true
+
+loan:
+  rules:
+    max-active-loans-per-member: ${LOAN_MAX_ACTIVE_PER_MEMBER:3}
+    duration-days: ${LOAN_DURATION_DAYS:14}

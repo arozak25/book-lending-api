@@ -27,16 +27,17 @@ CREATE TABLE IF NOT EXISTS `book` (
 CREATE TABLE IF NOT EXISTS `loan` (
   `_id` BIGINT NOT NULL AUTO_INCREMENT,
   `loan_uuid` BINARY(16),
-  `status` ENUM('ACTIVE', 'RETURNED', 'RETURNED_LATE', 'LOST') NOT NULL DEFAULT 'ACTIVE',
-  `student_id` BIGINT,
+  `status` ENUM('ACTIVE', 'COMPLETED', 'COMPLETED_LATE', 'LOST') NOT NULL DEFAULT 'ACTIVE',
+  `book_id` BIGINT,
   `member_id` BIGINT,
   `borrowed_utc` DATETIME(6),
   `due_utc` DATETIME(6),
+  `completed_utc` DATETIME(6),
   `created_utc` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   `updated_utc` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`_id`),
-  KEY `idx_loan_student_id` (`student_id`),
+  KEY `idx_loan_book_id` (`book_id`),
   KEY `idx_loan_member_id` (`member_id`),
-  CONSTRAINT `fk_loan_book` FOREIGN KEY (`student_id`) REFERENCES `book` (`_id`),
+  CONSTRAINT `fk_loan_book` FOREIGN KEY (`book_id`) REFERENCES `book` (`_id`),
   CONSTRAINT `fk_loan_member` FOREIGN KEY (`member_id`) REFERENCES `member` (`_id`)
 );
