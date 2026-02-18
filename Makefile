@@ -1,12 +1,13 @@
 DOCKER_COMPOSE ?= docker compose
 SERVICE_API ?= api
 
-.PHONY: help build test lint run up down stop restart logs ps clean
+.PHONY: help build test lint run up down stop restart logs ps clean ensure-test-infra
 
 help:
 	@echo "Available targets:"
 	@echo "  make build    - Build the project JAR with Maven"
 	@echo "  make test     - Run tests with Maven"
+	@echo "  make ensure-test-infra - Ensure Docker test infrastructure is running"
 	@echo "  make lint     - Run spotless linter with Maven"
 	@echo "  make run      - Run API locally with Maven"
 	@echo "  make up       - Start API + MySQL with Docker Compose"
@@ -21,7 +22,11 @@ build:
 	./mvnw clean package -DskipTests
 
 test:
-	./mvnw test
+	./scripts/ensure-test-infra.sh
+	./mvnw -Dskip.infra.ensure=true test
+
+ensure-test-infra:
+	./scripts/ensure-test-infra.sh
 
 lint:
 	./mvnw spotless:apply

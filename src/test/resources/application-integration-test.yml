@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:mysql://${IT_DB_HOST:localhost}:${IT_DB_PORT:3306}/${IT_DB_NAME:book_lending}
+    username: ${IT_DB_USERNAME:book_lending}
+    password: ${IT_DB_PASSWORD:book_lending}
+
+  flyway:
+    enabled: true
+    validate-on-migrate: false
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
