@@ -1,10 +1,10 @@
 package dev.arozaakk.booklendingapi.controller;
 
+import static dev.arozaakk.booklendingapi.common.RestDocs.prettyDocument;
+import static dev.arozaakk.booklendingapi.common.SqlScriptPaths.CLEANUP_SQL;
 import static dev.arozaakk.booklendingapi.factory.BookFactory.createBookCreate;
 import static dev.arozaakk.booklendingapi.factory.LoanFactory.createLoanCreate;
 import static dev.arozaakk.booklendingapi.factory.MemberFactory.createMemberCreate;
-import static dev.arozaakk.booklendingapi.common.RestDocs.prettyDocument;
-import static dev.arozaakk.booklendingapi.common.SqlScriptPaths.CLEANUP_SQL;
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;

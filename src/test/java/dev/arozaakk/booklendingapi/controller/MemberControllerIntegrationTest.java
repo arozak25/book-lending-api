@@ -1,9 +1,9 @@
 package dev.arozaakk.booklendingapi.controller;
 
-import static dev.arozaakk.booklendingapi.factory.MemberFactory.createMemberCreate;
-import static dev.arozaakk.booklendingapi.factory.MemberFactory.createMemberUpdate;
 import static dev.arozaakk.booklendingapi.common.RestDocs.prettyDocument;
 import static dev.arozaakk.booklendingapi.common.SqlScriptPaths.CLEANUP_SQL;
+import static dev.arozaakk.booklendingapi.factory.MemberFactory.createMemberCreate;
+import static dev.arozaakk.booklendingapi.factory.MemberFactory.createMemberUpdate;
 import static org.hamcrest.Matchers.hasItems;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
