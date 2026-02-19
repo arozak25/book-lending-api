@@ -4,6 +4,7 @@ import static dev.arozaakk.booklendingapi.model.mapper.MemberMapper.toMember;
 import static dev.arozaakk.booklendingapi.model.mapper.MemberMapper.toMemberEntity;
 
 import dev.arozaakk.booklendingapi.entity.MemberEntity;
+import dev.arozaakk.booklendingapi.exceptions.MemberNotFoundException;
 import dev.arozaakk.booklendingapi.model.Member;
 import dev.arozaakk.booklendingapi.model.MemberCreate;
 import dev.arozaakk.booklendingapi.model.MemberUpdate;
@@ -32,7 +33,10 @@ public class MemberServiceImpl implements MemberService {
   @Override
   @Transactional(readOnly = true)
   public Member getMemberById(UUID id) {
-    return toMember(memberRepository.findFirstByMemberUuid(id).orElseThrow());
+    return toMember(
+        memberRepository
+            .findFirstByMemberUuid(id)
+            .orElseThrow(() -> new MemberNotFoundException(id)));
   }
 
   @Override

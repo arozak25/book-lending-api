@@ -132,6 +132,44 @@ public class LoanControllerIntegrationTest {
 
   @Test
   @WithMockUser(roles = "ADMIN")
+  void createLoan_withAdmin_whenBookNotFound_shouldReturnNotFoundApiError() throws Exception {
+    Member member = memberService.createMember(createMemberCreate());
+    LoanCreate loanCreate = createLoanCreate(UUID.randomUUID(), member.id());
+
+    mockMvc
+        .perform(
+            post(LoanResource.PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loanCreate)))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.status").value(404))
+        .andExpect(jsonPath("$.code").value("book.not.found"))
+        .andExpect(jsonPath("$.message").value("Book not found"))
+        .andExpect(jsonPath("$.path").value(LoanResource.PATH))
+        .andExpect(jsonPath("$.timestamp").isString());
+  }
+
+  @Test
+  @WithMockUser(roles = "ADMIN")
+  void createLoan_withAdmin_whenMemberNotFound_shouldReturnNotFoundApiError() throws Exception {
+    Book book = bookService.createBook(createBookCreate());
+    LoanCreate loanCreate = createLoanCreate(book.id(), UUID.randomUUID());
+
+    mockMvc
+        .perform(
+            post(LoanResource.PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loanCreate)))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.status").value(404))
+        .andExpect(jsonPath("$.code").value("member.not.found"))
+        .andExpect(jsonPath("$.message").value("Member not found"))
+        .andExpect(jsonPath("$.path").value(LoanResource.PATH))
+        .andExpect(jsonPath("$.timestamp").isString());
+  }
+
+  @Test
+  @WithMockUser(roles = "ADMIN")
   void completeLoan_withAdmin_shouldReturnCompletedLoan() throws Exception {
     Book book = bookService.createBook(createBookCreate());
     Member member = memberService.createMember(createMemberCreate());
@@ -154,6 +192,25 @@ public class LoanControllerIntegrationTest {
 
     Book updatedBook = bookService.getBookById(book.id());
     assertEquals(availableBeforeCompleteLoan + 1, updatedBook.availableCopies());
+  }
+
+  @Test
+  @WithMockUser(roles = "ADMIN")
+  void completeLoan_withAdmin_whenLoanNotFound_shouldReturnNotFoundApiError() throws Exception {
+    UUID loanId = UUID.randomUUID();
+    LoanComplete loanComplete = new LoanComplete(LoanStatus.COMPLETED);
+
+    mockMvc
+        .perform(
+            patch(LoanResource.PATH + "/{id}", loanId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loanComplete)))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.status").value(404))
+        .andExpect(jsonPath("$.code").value("loan.not.found"))
+        .andExpect(jsonPath("$.message").value("Loan not found."))
+        .andExpect(jsonPath("$.path").value(LoanResource.PATH + "/" + loanId))
+        .andExpect(jsonPath("$.timestamp").isString());
   }
 
   @Test

@@ -8,6 +8,10 @@ import dev.arozaakk.booklendingapi.configuration.LoanRulesProperties;
 import dev.arozaakk.booklendingapi.entity.BookEntity;
 import dev.arozaakk.booklendingapi.entity.LoanEntity;
 import dev.arozaakk.booklendingapi.entity.MemberEntity;
+import dev.arozaakk.booklendingapi.exceptions.APIValidationException;
+import dev.arozaakk.booklendingapi.exceptions.BookNotFoundException;
+import dev.arozaakk.booklendingapi.exceptions.LoanNotFoundException;
+import dev.arozaakk.booklendingapi.exceptions.MemberNotFoundException;
 import dev.arozaakk.booklendingapi.model.Loan;
 import dev.arozaakk.booklendingapi.model.LoanComplete;
 import dev.arozaakk.booklendingapi.model.LoanCreate;
@@ -36,9 +40,14 @@ public class LoanServiceImpl implements LoanService {
   @Override
   @Transactional
   public Loan createLoan(LoanCreate loanCreate) {
-    BookEntity bookEntity = bookRepository.findFirstByBookUuid(loanCreate.bookId()).orElseThrow();
+    BookEntity bookEntity =
+        bookRepository
+            .findFirstByBookUuid(loanCreate.bookId())
+            .orElseThrow(() -> new BookNotFoundException(loanCreate.bookId()));
     MemberEntity memberEntity =
-        memberRepository.findFirstByMemberUuid(loanCreate.memberId()).orElseThrow();
+        memberRepository
+            .findFirstByMemberUuid(loanCreate.memberId())
+            .orElseThrow(() -> new MemberNotFoundException(loanCreate.memberId()));
     validateLoan(memberEntity, bookEntity);
 
     LoanEntity loanEntity =
@@ -52,9 +61,10 @@ public class LoanServiceImpl implements LoanService {
   @Override
   @Transactional
   public Loan completeLoan(UUID id, LoanComplete loanComplete) {
-    LoanEntity loanEntity = loanRepository.findFirstByLoanUuid(id).orElseThrow();
+    LoanEntity loanEntity =
+        loanRepository.findFirstByLoanUuid(id).orElseThrow(() -> new LoanNotFoundException(id));
     if (loanEntity.getStatus() != LoanStatus.ACTIVE) {
-      throw new IllegalStateException("Loan is already completed");
+      throw new APIValidationException("loan.already.completed");
     }
 
     LocalDateTime completedAt = LocalDateTime.now(UTC_ZONE);
@@ -74,7 +84,8 @@ public class LoanServiceImpl implements LoanService {
   @Override
   @Transactional(readOnly = true)
   public Loan getLoanById(UUID id) {
-    return toLoan(loanRepository.findFirstByLoanUuid(id).orElseThrow());
+    return toLoan(
+        loanRepository.findFirstByLoanUuid(id).orElseThrow(() -> new LoanNotFoundException(id)));
   }
 
   @Override
@@ -87,21 +98,21 @@ public class LoanServiceImpl implements LoanService {
       LoanStatus loanStatus, LocalDateTime completedAt, LocalDateTime dueDateTime) {
     if ((loanStatus == LoanStatus.COMPLETED || loanStatus == LoanStatus.COMPLETED_LATE)
         && dueDateTime == null) {
-      throw new IllegalStateException("Loan due date is required to complete loan");
+      throw new APIValidationException("loan.due.date.required");
     }
 
     if (loanStatus == LoanStatus.COMPLETED && completedAt.isAfter(dueDateTime)) {
-      throw new IllegalStateException("Loan status COMPLETED is only valid on or before due date");
+      throw new APIValidationException("loan.status.completed.invalid");
     }
 
     if (loanStatus == LoanStatus.COMPLETED_LATE && !completedAt.isAfter(dueDateTime)) {
-      throw new IllegalStateException("Loan status COMPLETED_LATE is only valid after due date");
+      throw new APIValidationException("loan.status.completed_late.invalid");
     }
   }
 
   private void validateLoan(MemberEntity memberEntity, BookEntity bookEntity) {
     if (bookEntity.getAvailableCopies() == null || bookEntity.getAvailableCopies() <= 0) {
-      throw new IllegalStateException("Book has no available copies");
+      throw new APIValidationException("book.no.available.copies");
     }
 
     LocalDateTime nowUtc = LocalDateTime.now(UTC_ZONE);
@@ -110,13 +121,13 @@ public class LoanServiceImpl implements LoanService {
             memberEntity, LoanStatus.ACTIVE, nowUtc);
 
     if (hasOverdueLoan) {
-      throw new IllegalStateException("Member has overdue loans and cannot borrow books");
+      throw new APIValidationException("member.has.overdue.loans");
     }
 
     long activeLoanCount =
         loanRepository.countByMemberEntityAndStatus(memberEntity, LoanStatus.ACTIVE);
     if (activeLoanCount >= loanRulesProperties.getMaxActiveLoansPerMember()) {
-      throw new IllegalStateException("Member has reached the maximum number of active loans");
+      throw new APIValidationException("member.max.active.loans.reached");
     }
   }
 }

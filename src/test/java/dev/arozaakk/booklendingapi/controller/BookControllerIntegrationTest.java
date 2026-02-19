@@ -16,12 +16,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import dev.arozaakk.booklendingapi.controller.resource.BookResource;
+import dev.arozaakk.booklendingapi.exceptions.BookNotFoundException;
 import dev.arozaakk.booklendingapi.model.Book;
 import dev.arozaakk.booklendingapi.model.BookCreate;
 import dev.arozaakk.booklendingapi.model.BookUpdate;
 import dev.arozaakk.booklendingapi.service.BookService;
 import jakarta.inject.Inject;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -192,6 +192,6 @@ public class BookControllerIntegrationTest {
         .perform(delete(BookResource.PATH + "/{id}", id))
         .andExpect(status().isNoContent())
         .andDo(prettyDocument("books-delete"));
-    assertThrows(NoSuchElementException.class, () -> bookService.getBookById(id));
+    assertThrows(BookNotFoundException.class, () -> bookService.getBookById(id));
   }
 }

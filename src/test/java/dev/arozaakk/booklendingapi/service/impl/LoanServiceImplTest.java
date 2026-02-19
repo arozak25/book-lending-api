@@ -15,6 +15,7 @@ import dev.arozaakk.booklendingapi.configuration.LoanRulesProperties;
 import dev.arozaakk.booklendingapi.entity.BookEntity;
 import dev.arozaakk.booklendingapi.entity.LoanEntity;
 import dev.arozaakk.booklendingapi.entity.MemberEntity;
+import dev.arozaakk.booklendingapi.exceptions.APIValidationException;
 import dev.arozaakk.booklendingapi.model.Loan;
 import dev.arozaakk.booklendingapi.model.LoanComplete;
 import dev.arozaakk.booklendingapi.model.LoanCreate;
@@ -55,7 +56,7 @@ class LoanServiceImplTest {
     when(memberRepository.findFirstByMemberUuid(memberEntity.getMemberUuid()))
         .thenReturn(Optional.of(memberEntity));
 
-    assertThrows(IllegalStateException.class, () -> loanService.createLoan(loanCreate));
+    assertThrows(APIValidationException.class, () -> loanService.createLoan(loanCreate));
     verify(loanRepository, never()).save(any(LoanEntity.class));
   }
 
@@ -77,7 +78,7 @@ class LoanServiceImplTest {
         .thenReturn(3L);
     when(loanRulesProperties.getMaxActiveLoansPerMember()).thenReturn(3L);
 
-    assertThrows(IllegalStateException.class, () -> loanService.createLoan(loanCreate));
+    assertThrows(APIValidationException.class, () -> loanService.createLoan(loanCreate));
     verify(loanRepository, never()).save(any(LoanEntity.class));
   }
 
@@ -96,7 +97,7 @@ class LoanServiceImplTest {
             eq(memberEntity), eq(LoanStatus.ACTIVE), any(LocalDateTime.class)))
         .thenReturn(true);
 
-    assertThrows(IllegalStateException.class, () -> loanService.createLoan(loanCreate));
+    assertThrows(APIValidationException.class, () -> loanService.createLoan(loanCreate));
     verify(loanRepository, never()).save(any(LoanEntity.class));
   }
 
@@ -145,12 +146,11 @@ class LoanServiceImplTest {
 
     when(loanRepository.findFirstByLoanUuid(loanId)).thenReturn(Optional.of(loanEntity));
 
-    IllegalStateException exception =
+    APIValidationException exception =
         assertThrows(
-            IllegalStateException.class, () -> loanService.completeLoan(loanId, loanComplete));
+            APIValidationException.class, () -> loanService.completeLoan(loanId, loanComplete));
 
-    assertEquals(
-        "Loan status COMPLETED is only valid on or before due date", exception.getMessage());
+    assertEquals("loan.status.completed.invalid", exception.getKey());
     verify(loanRepository, never()).save(any(LoanEntity.class));
   }
 
@@ -163,11 +163,11 @@ class LoanServiceImplTest {
 
     when(loanRepository.findFirstByLoanUuid(loanId)).thenReturn(Optional.of(loanEntity));
 
-    IllegalStateException exception =
+    APIValidationException exception =
         assertThrows(
-            IllegalStateException.class, () -> loanService.completeLoan(loanId, loanComplete));
+            APIValidationException.class, () -> loanService.completeLoan(loanId, loanComplete));
 
-    assertEquals("Loan status COMPLETED_LATE is only valid after due date", exception.getMessage());
+    assertEquals("loan.status.completed_late.invalid", exception.getKey());
     verify(loanRepository, never()).save(any(LoanEntity.class));
   }
 

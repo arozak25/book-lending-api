@@ -9,15 +9,16 @@ This reference is generated from MockMvc integration tests via Spring REST Docs.
 == Overview
 
 - Base URL: `http://localhost:8080`
-- Authentication: HTTP Basic (`ADMIN` role required)
+- Authentication: Bearer JWT (`ADMIN` role required on protected endpoints)
 - Content type: `application/json`
-- CSRF protection: disabled
 
 == Endpoint Map
 
 [cols="1,1,2,1",options="header"]
 |===
 |Domain |Method |Path |Success Status
+
+|Auth |`POST` |`/auth/token` |`200 OK`
 
 |Books |`POST` |`/books` |`201 Created`
 |Books |`GET` |`/books/{id}` |`200 OK`
@@ -35,6 +36,21 @@ This reference is generated from MockMvc integration tests via Spring REST Docs.
 |Loans |`GET` |`/loans` |`200 OK`
 |Loans |`GET` |`/loans/{id}` |`200 OK`
 |===
+
+== Authentication
+
+1. Request token with `POST /auth/token` using body:
++
+[source,json]
+----
+{
+  "username": "admin",
+  "password": "Admin123!"
+}
+----
+2. Use the token in protected API calls:
++
+`Authorization: Bearer <token>`
 
 == Books
 

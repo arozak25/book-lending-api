@@ -1,6 +1,8 @@
 spring:
   application:
     name: book-lending-api
+  messages:
+    basename: errorMessage
 
   datasource:
     url: jdbc:mysql://${DB_HOST}/${DB_NAME}
@@ -20,8 +22,16 @@ loan:
     max-active-loans-per-member: ${LOAN_MAX_ACTIVE_PER_MEMBER:3}
     duration-days: ${LOAN_DURATION_DAYS:14}
 
+security:
+  jwt:
+    secret: ${JWT_SECRET:replace-this-with-a-32-byte-minimum-jwt-secret}
+    expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
+
 management:
-    endpoints:
-        web:
-        exposure:
-            include: '*'
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always

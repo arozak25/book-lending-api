@@ -4,6 +4,7 @@ import static dev.arozaakk.booklendingapi.model.mapper.BookMapper.toBook;
 import static dev.arozaakk.booklendingapi.model.mapper.BookMapper.toBookEntity;
 
 import dev.arozaakk.booklendingapi.entity.BookEntity;
+import dev.arozaakk.booklendingapi.exceptions.BookNotFoundException;
 import dev.arozaakk.booklendingapi.model.Book;
 import dev.arozaakk.booklendingapi.model.BookCreate;
 import dev.arozaakk.booklendingapi.model.BookUpdate;
@@ -32,7 +33,8 @@ public class BookServiceImpl implements BookService {
   @Override
   @Transactional(readOnly = true)
   public Book getBookById(UUID id) {
-    return toBook(bookRepository.findFirstByBookUuid(id).orElseThrow());
+    return toBook(
+        bookRepository.findFirstByBookUuid(id).orElseThrow(() -> new BookNotFoundException(id)));
   }
 
   @Override
@@ -44,7 +46,8 @@ public class BookServiceImpl implements BookService {
   @Override
   @Transactional
   public Book updateBook(UUID id, BookUpdate bookUpdate) {
-    BookEntity bookEntity = bookRepository.findFirstByBookUuid(id).orElseThrow();
+    BookEntity bookEntity =
+        bookRepository.findFirstByBookUuid(id).orElseThrow(() -> new BookNotFoundException(id));
     bookEntity.setTitle(bookUpdate.title());
     bookEntity.setAuthor(bookUpdate.author());
     bookEntity.setIsbn(bookUpdate.isbn());
@@ -57,7 +60,8 @@ public class BookServiceImpl implements BookService {
   @Override
   @Transactional
   public void deleteBook(UUID id) {
-    BookEntity bookEntity = bookRepository.findFirstByBookUuid(id).orElseThrow();
+    BookEntity bookEntity =
+        bookRepository.findFirstByBookUuid(id).orElseThrow(() -> new BookNotFoundException(id));
     bookRepository.delete(bookEntity);
   }
 }
