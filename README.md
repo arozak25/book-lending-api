@@ -149,3 +149,15 @@ Generated files:
 
 - Flyway migration scripts are in `src/main/resources/db/migration`.
 - Initial schema is defined in `V1__baseline.sql`.
+
+## Actuator
+
+Spring Boot Actuator is enabled for operational visibility and basic runtime monitoring.
+
+- Base path: `/actuator`
+- Exposed endpoints:
+    - `/actuator/health`
+    - `/actuator/info`
+    - `/actuator/metrics`
+- Current security setup permits actuator endpoints without authentication.
+- Health endpoint is configured with `show-details: always`.
